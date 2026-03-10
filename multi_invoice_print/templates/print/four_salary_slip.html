@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 5mm;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Arial", "Helvetica", sans-serif;
+            font-size: 9pt;
+            width: 200mm;
+        }
+        
+        .box {
+            width: 48%;
+            height: 140mm;
+            border: 1px solid #000;
+            padding: 4mm;
+            float: left;
+            margin: 1%;
+            background-color: #fff;
+            position: relative;
+        }
+
+        .header-table {
+            width: 100%;
+            margin-bottom: 3mm;
+            border: none;
+        }
+        
+        .header-table td {
+            border: none;
+            padding: 1mm;
+        }
+
+        .company-name {
+            font-size: 13px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .company-info {
+            font-size: 8px;
+            margin: 0;
+        }
+
+        .slip-title {
+            text-align: center;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 2px 0;
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 3mm;
+        }
+
+        .employee-info {
+            width: 100%;
+            margin-bottom: 3mm;
+            font-size: 9px;
+            line-height: 1.3;
+            border: none;
+        }
+
+        .employee-info td {
+            border: none;
+        }
+
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8px;
+        }
+
+        .salary-table th {
+            border: 1px solid #000;
+            padding: 1mm;
+            text-align: left;
+            background-color: #f0f0f0;
+        }
+
+        .salary-table td {
+            border: 1px solid #000;
+            padding: 1mm;
+        }
+
+        .salary-table .totals {
+            font-weight: bold;
+            background-color: #e6e6e6;
+        }
+
+        .net-pay-box {
+            width: 100%;
+            margin-top: 2mm;
+            border: none;
+        }
+
+        .net-pay-box td:first-child {
+            background: #f2f2f2;
+            padding: 2mm;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .net-pay-box td:last-child {
+            font-weight: bold;
+            font-size: 12px;
+            text-align: right;
+            padding: 2mm;
+        }
+
+        .signature-area {
+            position: absolute;
+            bottom: 3mm;
+            left: 4mm;
+            right: 4mm;
+        }
+
+        .signature-table {
+            width: 100%;
+            border: none;
+            font-size: 9px;
+        }
+
+        .signature-table td {
+            border: none;
+            text-align: center;
+            vertical-align: bottom;
+        }
+
+        .signature-line {
+            border-top: 1px.5px solid #000;
+            width: 85%;
+            margin: 0 auto;
+            margin-bottom: 2mm;
+        }
+
+        .empty-box {
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    {% for slip in salary_slips[:4] %}
+    <div class="box">
+        <table class="header-table">
+            <tr>
+                <td width="20%" style="text-align: left;">
+                    <!-- Logo placeholder - remove img tag if no logo -->
+                </td>
+                <td style="text-align: center;">
+                    <h4 class="company-name">{{ slip.company }}</h4>
+                    <p class="company-info">{{ slip.company_address }}</p>
+                </td>
+                <td width="25%" style="text-align: right; font-size: 8px;">
+                    <b>Slip:</b> {{ slip.name }}<br>
+                    <b>Rev:</b> 01
+                </td>
+            </tr>
+        </table>
+
+        <div class="slip-title">SALARY SLIP</div>
+
+        <table class="employee-info">
+            <tr>
+                <td width="55%"><b>NAME:</b> {{ slip.employee_name }}</td>
+                <td width="45%" style="text-align: right;"><b>PERIOD:</b> {{ slip.start_date }} - {{ slip.end_date }}</td>
+            </tr>
+            <tr>
+                <td><b>DEPT:</b> {{ slip.department or "" }}</td>
+                <td style="text-align: right;"><b>PAID DAYS:</b> {{ slip.payment_days }}</td>
+            </tr>
+        </table>
+
+        <table width="100%" style="border: none; border-collapse: collapse;">
+            <tr>
+                <td style="vertical-align: top; border: none; padding-right: 2mm;">
+                    <table class="salary-table" width="100%">
+                        <tr><th width="60%">Earnings</th><th width="40%">Amount</th></tr>
+                        {% for e in slip.earnings %}
+                        <tr><td>{{ e.salary_component }}</td><td align="right">₱{{ "{:,.2f}".format(e.amount) }}</td></tr>
+                        {% endfor %}
+                        <tr class="totals"><td>GROSS</td><td align="right">₱{{ "{:,.2f}".format(slip.gross_pay) }}</td></tr>
+                    </table>
+                </td>
+                <td style="vertical-align: top; border: none; padding-left: 2mm;">
+                    <table class="salary-table" width="100%">
+                        <tr><th width="60%">Deductions</th><th width="40%">Amount</th></tr>
+                        {% for d in slip.deductions %}
+                        <tr><td>{{ d.salary_component }}</td><td align="right">₱{{ "{:,.2f}".format(d.amount) }}</td></tr>
+                        {% endfor %}
+                        <tr class="totals"><td>DEDUCT</td><td align="right">₱{{ "{:,.2f}".format(slip.total_deduction) }}</td></tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <table class="net-pay-box" width="100%">
+            <tr>
+                <td width="65%"><b>NET SALARY (PHP)</b></td>
+                <td width="35%" style="text-align: right;">₱{{ "{:,.2f}".format(slip.net_pay) }}</td>
+            </tr>
+        </table>
+
+        <div class="signature-area">
+            <table class="signature-table">
+                <tr>
+                    <td width="50%">
+                        <div class="signature-line"></div>
+                        <b>Issued By:</b><br>
+                        <span>{{ frappe.get_fullname(slip.owner) }}</span>
+                    </td>
+                    <td width="50%">
+                        <div class="signature-line"></div>
+                        <b>Received By:</b><br>
+                        <span>Name and Signature</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+    
+    {% for i in range(4 - salary_slips|length) %}
+    <div class="box empty-box">
+        Empty Slot
+    </div>
+    {% endfor %}
+</body>
+</html>
