@@ -8,8 +8,9 @@ def print_four_invoices(names):
         import json
         names = json.loads(names)
     
-    invoices = []
-    for invoice_name in names[:4]:
+    # Process all invoices
+    all_invoices = []
+    for invoice_name in names:
         inv = frappe.get_doc("Sales Invoice", invoice_name)
         
         # Calculate totals - use try/except for optional fields
@@ -104,11 +105,16 @@ def print_four_invoices(names):
                 "discount_amount": getattr(item, 'discount_amount', 0) or 0
             })
         
-        invoices.append(invoice_data)
+        all_invoices.append(invoice_data)
+
+    # Create batches of 4 per page
+    batches = []
+    for i in range(0, len(all_invoices), 4):
+        batches.append(all_invoices[i:i+4])
 
     html = frappe.render_template(
         "multi_invoice_print/templates/print/four_invoice.html",
-        {"invoices": invoices}
+        {"batches": batches}
     )
 
     pdf = get_pdf(html)
@@ -124,8 +130,9 @@ def print_four_salary_slips(names):
         import json
         names = json.loads(names)
     
-    salary_slips = []
-    for slip_name in names[:4]:
+    # Process all salary slips
+    all_salary_slips = []
+    for slip_name in names:
         slip = frappe.get_doc("Salary Slip", slip_name)
         
         # Get earnings and deductions
@@ -174,11 +181,16 @@ def print_four_salary_slips(names):
             "deductions": deductions
         }
         
-        salary_slips.append(slip_data)
+        all_salary_slips.append(slip_data)
+
+    # Create batches of 4 per page
+    batches = []
+    for i in range(0, len(all_salary_slips), 4):
+        batches.append(all_salary_slips[i:i+4])
 
     html = frappe.render_template(
         "multi_invoice_print/templates/print/four_salary_slip.html",
-        {"salary_slips": salary_slips}
+        {"batches": batches}
     )
 
     pdf = get_pdf(html)

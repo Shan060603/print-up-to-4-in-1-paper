@@ -33,6 +33,10 @@
             position: relative;
             overflow: hidden;
         }
+        
+        .page-break {
+            page-break-after: always;
+        }
 
         .header-table {
             width: 100%;
@@ -159,7 +163,8 @@
     </style>
 </head>
 <body>
-    {% for slip in salary_slips[:4] %}
+    {% for batch in batches %}
+    {% for slip in batch %}
     <div class="box">
         <table class="header-table">
             <tr>
@@ -234,10 +239,15 @@
     </div>
     {% endfor %}
     
-    {% for i in range(4 - salary_slips|length) %}
+    {% for i in range(4 - batch|length) %}
     <div class="box empty-box">
         Empty Slot
     </div>
+    {% endfor %}
+    
+    {% if not loop.last %}
+    <div class="page-break"></div>
+    {% endif %}
     {% endfor %}
 </body>
 </html>

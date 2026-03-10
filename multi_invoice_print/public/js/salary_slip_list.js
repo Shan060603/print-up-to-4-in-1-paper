@@ -1,15 +1,10 @@
 frappe.listview_settings["Salary Slip"] = {
     onload(listview) {
-        listview.page.add_inner_button(__("Print 4 Salary Slip Sheet"), function() {
+        listview.page.add_inner_button(__("Print Salary Slips (4 per page)"), function() {
             let selected = listview.get_checked_items();
 
             if (selected.length === 0) {
                 frappe.msgprint(__("Please select at least one salary slip to print."));
-                return;
-            }
-
-            if (selected.length > 4) {
-                frappe.msgprint(__("Please select maximum of 4 salary slips."));
                 return;
             }
 
