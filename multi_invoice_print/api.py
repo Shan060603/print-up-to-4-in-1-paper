@@ -146,6 +146,17 @@ def print_four_salary_slips(names):
         # Get company info
         company = frappe.get_doc("Company", slip.company)
         
+        # Try to get company address from Address doctype
+        company_address = ""
+        try:
+            address = frappe.get_value("Address", {"company": slip.company, "address_type": "Billing"}, "address")
+            if address:
+                company_address = address
+            else:
+                company_address = company.name or ""
+        except:
+            company_address = company.name or ""
+        
         slip_data = {
             "name": slip.name,
             "employee_name": slip.employee_name,
@@ -157,7 +168,7 @@ def print_four_salary_slips(names):
             "total_deduction": slip.total_deduction,
             "net_pay": slip.net_pay,
             "company": slip.company,
-            "company_address": company.address or "",
+            "company_address": company_address,
             "owner": slip.owner,
             "earnings": earnings,
             "deductions": deductions
