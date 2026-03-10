@@ -22,20 +22,26 @@
             width: 159.2mm;
         }
         
+        .batch-container {
+            width: 100%;
+        }
+        
         .box {
             width: 48%;
             height: 118mm;
             border: 1px solid #000;
             padding: 1.5mm;
-            float: left;
+            display: inline-block;
             margin: 1%;
             background-color: #fff;
             position: relative;
             overflow: hidden;
+            vertical-align: top;
         }
         
         .page-break {
             page-break-after: always;
+            clear: both;
         }
 
         .receipt-header {
@@ -164,97 +170,99 @@
 </head>
 <body>
     {% for batch in batches %}
-    {% for inv in batch %}
-    <div class="box">
-        <div class="receipt-header">
-            <div class="receipt-title">OFFICIAL RECEIPT</div>
-            <div class="company-info">{{ inv['company'] }}</div>
-        </div>
-        
-        <div class="receipt-details">
-            <div class="detail-row">
-                <span><span class="label">Receipt No:</span> {{ inv['name'] }}</span>
-                <span><span class="label">Date:</span> {{ inv['posting_date'] }}</span>
+    <div class="batch-container">
+        {% for inv in batch %}
+        <div class="box">
+            <div class="receipt-header">
+                <div class="receipt-title">OFFICIAL RECEIPT</div>
+                <div class="company-info">{{ inv['company'] }}</div>
             </div>
-            <div class="detail-row">
-                <span><span class="label">Customer:</span> {{ inv['customer_name'] or inv['customer'] }}</span>
+            
+            <div class="receipt-details">
+                <div class="detail-row">
+                    <span><span class="label">Receipt No:</span> {{ inv['name'] }}</span>
+                    <span><span class="label">Date:</span> {{ inv['posting_date'] }}</span>
+                </div>
+                <div class="detail-row">
+                    <span><span class="label">Customer:</span> {{ inv['customer_name'] or inv['customer'] }}</span>
+                </div>
             </div>
-        </div>
-        
-        {% if inv['items'] %}
-        <table class="items-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Rate</th>
-                    <th>Amt</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in inv['items'] %}
-                <tr>
-                    <td>{{ item['item_code'] or item['item_name'] }}</td>
-                    <td>{{ item['qty'] }}</td>
-                    <td>{{ inv['currency'] }} {{ "%.2f"|format(item['rate']) }}</td>
-                    <td>{{ inv['currency'] }} {{ "%.2f"|format(item['amount']) }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% endif %}
-        
-        <div class="totals-section">
-            <div class="total-row">
-                <span class="label">Subtotal:</span>
-                <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['net_total']) }}</span>
-            </div>
-            {% if inv['discount_amount'] > 0 %}
-            <div class="total-row">
-                <span class="label">Discount:</span>
-                <span class="value">-{{ inv['currency'] }} {{ "%.2f"|format(inv['discount_amount']) }}</span>
-            </div>
+            
+            {% if inv['items'] %}
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Rate</th>
+                        <th>Amt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in inv['items'] %}
+                    <tr>
+                        <td>{{ item['item_code'] or item['item_name'] }}</td>
+                        <td>{{ item['qty'] }}</td>
+                        <td>{{ inv['currency'] }} {{ "%.2f"|format(item['rate']) }}</td>
+                        <td>{{ inv['currency'] }} {{ "%.2f"|format(item['amount']) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             {% endif %}
-            <div class="total-row">
-                <span class="label">Tax:</span>
-                <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['total_tax']) }}</span>
+            
+            <div class="totals-section">
+                <div class="total-row">
+                    <span class="label">Subtotal:</span>
+                    <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['net_total']) }}</span>
+                </div>
+                {% if inv['discount_amount'] > 0 %}
+                <div class="total-row">
+                    <span class="label">Discount:</span>
+                    <span class="value">-{{ inv['currency'] }} {{ "%.2f"|format(inv['discount_amount']) }}</span>
+                </div>
+                {% endif %}
+                <div class="total-row">
+                    <span class="label">Tax:</span>
+                    <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['total_tax']) }}</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span class="label">TOTAL:</span>
+                    <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['grand_total']) }}</span>
+                </div>
             </div>
-            <div class="total-row grand-total">
-                <span class="label">TOTAL:</span>
-                <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['grand_total']) }}</span>
+            
+            <div class="payment-section">
+                <div class="payment-row">
+                    <span class="label">Amount Paid:</span>
+                    <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['paid_amount']) }}</span>
+                </div>
+                {% if inv['change_amount'] > 0 %}
+                <div class="payment-row">
+                    <span class="label">Change:</span>
+                    <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['change_amount']) }}</span>
+                </div>
+                {% endif %}
+                {% if inv['outstanding_amount'] > 0 %}
+                <div class="payment-row">
+                    <span class="label">Balance Due:</span>
+                    <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['outstanding_amount']) }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="signature-area">
+                <div class="signature-line">Authorized Signature</div>
             </div>
         </div>
+        {% endfor %}
         
-        <div class="payment-section">
-            <div class="payment-row">
-                <span class="label">Amount Paid:</span>
-                <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['paid_amount']) }}</span>
-            </div>
-            {% if inv['change_amount'] > 0 %}
-            <div class="payment-row">
-                <span class="label">Change:</span>
-                <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['change_amount']) }}</span>
-            </div>
-            {% endif %}
-            {% if inv['outstanding_amount'] > 0 %}
-            <div class="payment-row">
-                <span class="label">Balance Due:</span>
-                <span class="value">{{ inv['currency'] }} {{ "%.2f"|format(inv['outstanding_amount']) }}</span>
-            </div>
-            {% endif %}
+        {% for i in range(4 - batch|length) %}
+        <div class="box empty-box">
+            Empty Slot
         </div>
-        
-        <div class="signature-area">
-            <div class="signature-line">Authorized Signature</div>
-        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-    
-    {% for i in range(4 - batch|length) %}
-    <div class="box empty-box">
-        Empty Slot
-    </div>
-    {% endfor %}
     
     {% if not loop.last %}
     <div class="page-break"></div>

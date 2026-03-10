@@ -22,20 +22,26 @@
             width: 159.2mm;
         }
         
+        .batch-container {
+            width: 100%;
+        }
+        
         .box {
             width: 48%;
             height: 118mm;
             border: 1px solid #000;
             padding: 1.5mm;
-            float: left;
+            display: inline-block;
             margin: 1%;
             background-color: #fff;
             position: relative;
             overflow: hidden;
+            vertical-align: top;
         }
         
         .page-break {
             page-break-after: always;
+            clear: both;
         }
 
         .header-table {
@@ -164,86 +170,88 @@
 </head>
 <body>
     {% for batch in batches %}
-    {% for slip in batch %}
-    <div class="box">
-        <table class="header-table">
-            <tr>
-                <td width="20%" style="text-align: left;">
-                    <!-- Logo placeholder -->
-                </td>
-                <td style="text-align: center;">
-                    <h4 class="company-name">{{ slip.company }}</h4>
-                    <p class="company-info">{{ slip.company_address }}</p>
-                </td>
-                <td width="25%" style="text-align: right; font-size: 5pt;">
-                    <b>Slip:</b> {{ slip.name }}<br>
-                    <b>Rev:</b> 01
-                </td>
-            </tr>
-        </table>
-
-        <div class="slip-title">SALARY SLIP</div>
-
-        <table class="employee-info">
-            <tr>
-                <td width="55%"><b>NAME:</b> {{ slip.employee_name }}</td>
-                <td width="45%" style="text-align: right;"><b>PERIOD:</b> {{ slip.start_date }} - {{ slip.end_date }}</td>
-            </tr>
-            <tr>
-                <td><b>DEPT:</b> {{ slip.department or "" }}</td>
-                <td style="text-align: right;"><b>PAID DAYS:</b> {{ slip.payment_days }}</td>
-            </tr>
-        </table>
-
-        <!-- Earnings Table (Top) -->
-        <table class="salary-table">
-            <tr><th width="60%">Earnings</th><th width="40%">Amount</th></tr>
-            {% for e in slip.earnings %}
-            <tr><td>{{ e.salary_component }}</td><td align="right">₱{{ "{:,.2f}".format(e.amount) }}</td></tr>
-            {% endfor %}
-            <tr class="totals"><td>GROSS</td><td align="right">₱{{ "{:,.2f}".format(slip.gross_pay) }}</td></tr>
-        </table>
-
-        <!-- Deductions Table (Below) -->
-        <table class="salary-table">
-            <tr><th width="60%">Deductions</th><th width="40%">Amount</th></tr>
-            {% for d in slip.deductions %}
-            <tr><td>{{ d.salary_component }}</td><td align="right">₱{{ "{:,.2f}".format(d.amount) }}</td></tr>
-            {% endfor %}
-            <tr class="totals"><td>DEDUCT</td><td align="right">₱{{ "{:,.2f}".format(slip.total_deduction) }}</td></tr>
-        </table>
-
-        <table class="net-pay-box" width="100%">
-            <tr>
-                <td width="65%"><b>NET SALARY (PHP)</b></td>
-                <td width="35%" style="text-align: right;">₱{{ "{:,.2f}".format(slip.net_pay) }}</td>
-            </tr>
-        </table>
-
-        <div class="signature-area">
-            <table class="signature-table">
+    <div class="batch-container">
+        {% for slip in batch %}
+        <div class="box">
+            <table class="header-table">
                 <tr>
-                    <td width="50%">
-                        <div class="signature-line"></div>
-                        <b>Issued By:</b><br>
-                        <span>{{ frappe.get_fullname(slip.owner) }}</span>
+                    <td width="20%" style="text-align: left;">
+                        <!-- Logo placeholder -->
                     </td>
-                    <td width="50%">
-                        <div class="signature-line"></div>
-                        <b>Received By:</b><br>
-                        <span>Name and Signature</span>
+                    <td style="text-align: center;">
+                        <h4 class="company-name">{{ slip.company }}</h4>
+                        <p class="company-info">{{ slip.company_address }}</p>
+                    </td>
+                    <td width="25%" style="text-align: right; font-size: 5pt;">
+                        <b>Slip:</b> {{ slip.name }}<br>
+                        <b>Rev:</b> 01
                     </td>
                 </tr>
             </table>
+
+            <div class="slip-title">SALARY SLIP</div>
+
+            <table class="employee-info">
+                <tr>
+                    <td width="55%"><b>NAME:</b> {{ slip.employee_name }}</td>
+                    <td width="45%" style="text-align: right;"><b>PERIOD:</b> {{ slip.start_date }} - {{ slip.end_date }}</td>
+                </tr>
+                <tr>
+                    <td><b>DEPT:</b> {{ slip.department or "" }}</td>
+                    <td style="text-align: right;"><b>PAID DAYS:</b> {{ slip.payment_days }}</td>
+                </tr>
+            </table>
+
+            <!-- Earnings Table (Top) -->
+            <table class="salary-table">
+                <tr><th width="60%">Earnings</th><th width="40%">Amount</th></tr>
+                {% for e in slip.earnings %}
+                <tr><td>{{ e.salary_component }}</td><td align="right">₱{{ "{:,.2f}".format(e.amount) }}</td></tr>
+                {% endfor %}
+                <tr class="totals"><td>GROSS</td><td align="right">₱{{ "{:,.2f}".format(slip.gross_pay) }}</td></tr>
+            </table>
+
+            <!-- Deductions Table (Below) -->
+            <table class="salary-table">
+                <tr><th width="60%">Deductions</th><th width="40%">Amount</th></tr>
+                {% for d in slip.deductions %}
+                <tr><td>{{ d.salary_component }}</td><td align="right">₱{{ "{:,.2f}".format(d.amount) }}</td></tr>
+                {% endfor %}
+                <tr class="totals"><td>DEDUCT</td><td align="right">₱{{ "{:,.2f}".format(slip.total_deduction) }}</td></tr>
+            </table>
+
+            <table class="net-pay-box" width="100%">
+                <tr>
+                    <td width="65%"><b>NET SALARY (PHP)</b></td>
+                    <td width="35%" style="text-align: right;">₱{{ "{:,.2f}".format(slip.net_pay) }}</td>
+                </tr>
+            </table>
+
+            <div class="signature-area">
+                <table class="signature-table">
+                    <tr>
+                        <td width="50%">
+                            <div class="signature-line"></div>
+                            <b>Issued By:</b><br>
+                            <span>{{ frappe.get_fullname(slip.owner) }}</span>
+                        </td>
+                        <td width="50%">
+                            <div class="signature-line"></div>
+                            <b>Received By:</b><br>
+                            <span>Name and Signature</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
+        {% endfor %}
+        
+        {% for i in range(4 - batch|length) %}
+        <div class="box empty-box">
+            Empty Slot
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-    
-    {% for i in range(4 - batch|length) %}
-    <div class="box empty-box">
-        Empty Slot
-    </div>
-    {% endfor %}
     
     {% if not loop.last %}
     <div class="page-break"></div>
